@@ -8,7 +8,6 @@ from tqdm import tqdm
 
 
 def get_landscape(Q,k=101):
-    # инициализация ионно-совместимого анзаца
     
     cost = np.zeros((k,k))
     beta = np.linspace(0,0.5*np.pi,k)
