@@ -11,32 +11,20 @@ from hamiltonians import ion_native_hamiltonian
 
 class QAOA:
     
-    def __init__(self,depth,H1,H2):   
-        """                                                 
-        Конструктор класса QAOA (инициализация).
-        
-        Args:
-            depth (int): глубина QAOA-подобного анзаца
-            H1 (numpy array): диагональный гамильтониан, определяющий оператор изменения фазы (пропагатор)
-            H2 (numpy array): диагональный целевой гамильтониан для минимизации
-        """                                   
+    def __init__(self,depth,H1,H2):                          
         
         self.H1 = H1
         self.H2 = H2
-        self.n = int(np.log2(int(len(self.H1)))) # Расчет числа кубитов.
+        self.n = int(np.log2(int(len(self.H1)))) 
         
         #______________________________________________________________________________________________________
-        self.X = self.new_mixerX()              # Выполняет последовательность преобразований над массивами,
-                                                # реализующих эффект применения оператора \sum \sigma_x, к
-                                                # смешивающего кубиты, к вектору квантового состояния,
+        self.X = self.new_mixerX()             
 
         #______________________________________________________________________________________________________
         
-        self.min = min(self.H2)                  # Минимальное собственное значение целевого гамильтониана 
-                                                 # (энергия основного состояния)
-        
+        self.min = min(self.H2)                  
         self.deg = len(self.H2[self.H2 == self.min]) 
-        self.p = depth                           # Стандартная глубина QAOA в обозначении p
+        self.p = depth                           
         
         self.heruistic_LW_seed1 = 10
         self.heruistic_LW_seed2 = 20
@@ -44,14 +32,6 @@ class QAOA:
         #______________________________________________________________________________________________________   
     
     def new_mixerX(self):
-        """
-        Создает последовательность преобразований над вектором квантового 
-        состояния под действием оператора, смешивающего кубиты, в виде 
-        списка перестановок индексов кубитов.
-        
-        Returns:
-            list: список перестановок индексов кубитов
-        """
 
         def split(x,k):
             return x.reshape((2**k,-1))
@@ -87,32 +67,14 @@ class QAOA:
     #__________________________________________________________________________________________________________   
         
     def U_gamma(self,angle,state):
-        """
-        Применить оператор изменения фазы exp{-i*gamma*H} к вектору квантового состояния.
-        
-        Args:
-            angle (float): вариационный параметр
-            state (numpy array): вектор квантового состояния
-        
-        Returns:
-            numpy array: преобразованный вектор квантового состояния
-        """       
+   
         t = -1j*angle
         state = state*np.exp(t*self.H1.reshape(2**self.n,1))
         
         return state
     
     def V_beta(self,angle,state):       
-        """
-         Применить оператор смешения кубитов exp{-i*beta*H_x} к вектору квантового состояния.
         
-        Args:
-            angle (float): вариационный параметр
-            state (numpy array): вектор квантового состояния
-        
-        Returns:
-            numpy array: преобразованный вектор квантового состояния
-        """
         c = np.cos(angle)
         s = np.sin(angle)
         
@@ -126,19 +88,6 @@ class QAOA:
     #__________________________________________________________________________________________________________
     
     def qaoa_ansatz(self, angles):
-        """
-        Вычисление вектора квантового состояния, приготовленного QAOA-подобным анзацем, т.е.
-        последовательностью операторов изменения фазы exp{-i*gamma*H} и смешения кубитов exp{-i*beta*H_x}
-        для квантовой цепи глубины p с вектором вариационных параметров 
-        [gamma_1,gamma_2,...,gamma_p,beta_1,beta2,....beta_p], примененной к начальному состоянию |+>.
-        
-        Args:
-            angles (numpy array): вектор вариационных параметров 
-                                  [gamma_1,gamma_2,...,gamma_p,beta_1,beta2,....beta_p]
-        
-        Returns:
-            numpy array: вектор квантового состояния после применения QAOA-подобного анзаца
-        """
         
         state = np.ones((2**self.n,1),dtype = 'complex128')*(1/np.sqrt(2**self.n))
         p = int(len(angles)/2)
@@ -151,17 +100,7 @@ class QAOA:
     #__________________________________________________________________________________________________________ 
     
     def apply_ansatz(self, angles, state):
-        """
-        Применение последоватльности операторов QAOA-подобного анзаца к заданному квантовому состоянию state. 
-        
-        Args:
-            angle (numpy array): вектор вариационных параметров 
-                                 [gamma_1,gamma_2,...,gamma_p,beta_1,beta2,....beta_p]
-            state (numpy array): вектор квантового состояния
-        
-        Returns:
-            numpy array: преобразованный вектор квантового состояния
-        """
+
         p = int(len(angles)/2)
         for i in range(p):
             state = self.U_gamma(angles[i],state)
@@ -172,15 +111,7 @@ class QAOA:
     #__________________________________________________________________________________________________________ 
     
     def expectation(self,angles): 
-        """
-        Вычисление математического ожидаемого энергии целевого гамильтониана.
-        
-        Args:
-            angles (numpy array): вектор вариационных параметров
-        
-        Returns:
-            float: математическое ожидаемое энергии
-        """ 
+
         state = self.qaoa_ansatz(angles)
         
         ex = np.vdot(state,state*(self.H2).reshape((2**self.n,1)))
@@ -189,15 +120,7 @@ class QAOA:
             
     
     def overlap(self,state):
-        """
-        Вычисление перекрытия заданного состояния с основным состояниям целевого гамильтониана.
         
-        Args:
-            state (numpy array): вектор квантового состояния
-        
-        Returns:
-            float: величина перекрытия
-        """       
         g_ener = min(self.H2)
         olap = 0
         for i in range(len(self.H2)):
@@ -209,11 +132,7 @@ class QAOA:
    #__________________________________________________________________________________________________________ 
     
     def run_heuristic_LW(self):
-        """
-        Симуляция варационного QAOA-подобного квантового алгоритма с
-        использованием эвристического метода оптимизации квантовой цепи 
-        по слоям (layer-wise, LW).
-        """
+
         initial_guess = lambda x: ([np.random.uniform(0,2*np.pi) for _ in range(x) ] 
                                    + [np.random.uniform(0,0.5*np.pi) for _ in range(x)])
         bds = lambda x: [(0.0,2*np.pi)]*x + [(0.0,0.5*np.pi)]*x
@@ -283,17 +202,6 @@ class QAOA:
     
     
     def sample_fidelities_fixed_depth(self, p, n_samples):
-        """
-        Генерация выборки перекрытий, порожденных анзацем, 
-        для заданной глубины анзаца p.
-        
-        Args:
-            p (int): глубина QAOA-подобного анзаца
-            n_samples (int): размер выборки перекрытий
-        
-        Returns:
-            numpy array: сгенерированная выборка перекрытий
-        """
          
         F = np.zeros(n_samples)
         
@@ -311,18 +219,7 @@ class QAOA:
     #__________________________________________________________________________________________________________ 
     
     def sample_fidelities(self, p_max, n_samples):
-        """
-        Генерация выборки перекрытий для каждой глубины анзаца в диапазоне,
-        не превышающем p_max слоев. 
-        
-        Args:
-            p_max (int): максимальная глубина QAOA-подобного анзаца
-            n_samples (int): размер выборки перекрытий
-        
-        Returns:
-            list: список массивов сгенерированный выборок перекрытий для каждой глубины 
-            анзаца в диапазоне от 1 до p_max слоев
-        """
+
         fidelities = np.zeros((p_max, n_samples))
         
         for p in range(1, p_max + 1):
@@ -334,34 +231,27 @@ class QAOA:
     
 def run_QAOA_for_fixed_p(H1,H2,p,n_runs):
         
-    # инициализация ионно-совместимого анзаца
     Q = QAOA(p,H1,H2)
-        
-    # инициализация массивов для хранения результатов запусков
+    
     energies = np.zeros(n_runs)
     ovlp = np.zeros(n_runs)
     angles = np.zeros((n_runs,2*p))
             
-    # несколько запусков минимизации с помощью эвристического метода
-    # оптимизации квантовой цепи по слоям в попытке достичь глобального минимума
     for i in range(n_runs):
         Q.run_heuristic_LW()
         energies[i] = Q.q_energy
         angles[i,:] = Q.opt_angles
         ovlp[i] = Q.olap
             
-    # извлечение лучшего результата с наименьшей энергией
     imin = np.argmin(energies)
     
     return energies[imin], angles[imin,:], ovlp[imin]
 
 def run_QAOA(H1,H2,p_max,n_runs):
     
-    # инициализация массивов для хранения результатов запусков
     energies = np.zeros(p_max)
     ovlp = np.zeros(p_max)
     
-    # цикл глубине анзаца
     for p in range(1,p_max+1):
         
         energies[p-1], angles, ovlp[p-1] = run_QAOA_for_fixed_p(H1,H2,p,n_runs)

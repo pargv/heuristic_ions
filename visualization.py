@@ -6,10 +6,6 @@ rc = {"font.family" : "Times New Roman",
       "mathtext.fontset" : "cm"}
 plt.rcParams.update(rc)
 
-# =============================================================================
-#                              Визуализация
-# =============================================================================
-
 def set_label_font(ax,fs):
     for tick in ax.xaxis.get_major_ticks():
         tick.label1.set_fontsize(fs) 
@@ -19,19 +15,7 @@ def set_label_font(ax,fs):
         ax.spines[axis].set_linewidth(1.5)
 
 def plot_expr(L, expr_sets, labels, markers, colors, ymax=1e1):
-    """
-    Построение графиков экспрессивностей как функций глубины анзаца,
-    переданных в виде списка. 
 
-    Args:
-        L (numpy array): массив значений с числом слоев анзаца
-        expr_sets (list): список массивов с экспрессивностями как 
-                          функциями глубины анзаца
-        labels (list): список подписей в легенде
-        markers (list): список символов для отображения точек
-        colors (list): список цветов
-
-    """
     fig = plt.figure(figsize=(6,4))
     ax = plt.gca()
 
@@ -56,22 +40,7 @@ def plot_expr(L, expr_sets, labels, markers, colors, ymax=1e1):
 
             
 def plot_distributions(n,n_bins,F,xmax=1,half_dim=1):
-    """
-    Построение графика с гистограммой плотности 
-    распределения перекрытий в сравнении с плотностью 
-    распределения в ансамбле состояний Хаара.
 
-    Args:
-        n (int): число кубитов
-        n_bins (int): число столбцов для построения гистограммы с 
-                      распределением перекрытий
-        F (numpy array): массив с выборкой перекрытий
-        xmax (float, optional): правая граница по оси x при построении графика.
-                                По умолчанию, 1.
-        half_dim (int, optional): учет поправки на симметрию QAOA-подобного
-                                  анзаца, уменьшающей размерность гильбертова 
-                                  пространства состояний. По умолчанию, 1.
-    """
     fig = plt.figure(figsize = (6,4))
     ax = plt.gca()
     
@@ -100,19 +69,7 @@ def plot_distributions(n,n_bins,F,xmax=1,half_dim=1):
     plt.show()
     
 def plot_energies(data_sets, labels, markers, colors, lvl, ymax):
-    """
-    Построение графиков расчетных энергий основного состояния 
-    как функций глубины анзаца, переданных в виде списка.
 
-    Args:
-        data_sets (list): список массивов с расчетными энергиями
-                          основного состояния как функциями глубины цепи
-        labels (list): список подписей в легенде
-        markers (list): список символов для отображения точек
-        colors (list): список цветов
-        lvl (float): уровень точной энергии основного состояния 
-        ymax (float): верхняя граница по оси y при построении графика
-    """
     fig = plt.figure(figsize = (6,4))
     ax = plt.gca()
     
@@ -136,20 +93,7 @@ def plot_energies(data_sets, labels, markers, colors, lvl, ymax):
     
     
 def plot_energies_log(data_sets, labels, markers, colors, lvl, ymin):
-    """
-    Построение графиков ошибки между расчетной энергией и 
-    энергией основного состояния  как функций глубины анзаца, 
-    переданных в виде списка.
 
-    Args:
-        data_sets (list): список массивов с расчетными энергиями
-                          основного состояния как функциями глубины цепи
-        labels (list): список подписей в легенде
-        markers (list): список символов для отображения точек
-        colors (list): список цветов
-        lvl (float): уровень точной энергии основного состояния 
-        ymax (float): верхняя граница по оси y при построении графика
-    """
     fig = plt.figure(figsize = (6,4))
     ax = plt.gca()
     
@@ -180,7 +124,6 @@ def plot_energies_log(data_sets, labels, markers, colors, lvl, ymin):
     
 def plot_energies_log_avg(data_sets, labels, markers, colors, ymin, ncol=2, loc=1):
 
-
     p = data_sets[0].shape[0]
     fig = plt.figure(figsize = (0.6*p,3.5))
     ax = plt.gca()
@@ -207,7 +150,6 @@ def plot_energies_log_avg(data_sets, labels, markers, colors, ymin, ncol=2, loc=
     
     plt.show()
     
-    
 def draw_graph(G, pos, label_pos = 0.5):
     plt.figure(figsize=(5,4))
     
@@ -222,7 +164,6 @@ def draw_graph(G, pos, label_pos = 0.5):
                                     label_pos=label_pos, font_size=12)
     nx.draw_networkx_labels(G, pos, labels, font_size=22, font_color='white')
    
-    
     plt.show()
     
     
@@ -260,14 +201,12 @@ def plot_landscape(landscape):
     cbaxes = fig.add_axes([0.92, 0.14, 0.03, 0.6]) 
     cb = plt.colorbar(sc, cax = cbaxes, orientation = 'vertical')
     cb.ax.tick_params(labelsize=14)
-    #cbaxes.xaxis.set_label_position('top')
-    #cb.ax.set_yticks([0.4,0.2,0.0,-0.2,-0.4,-0.6])
     
     ax.text(x=n,y=n-3,s='$E(\\beta,\gamma)$', fontsize=18)
        
     plt.show()
     
-def plot_energy_hist(energies,s,xmax):
+def plot_energy_hist(energies,s):
     
     fig = plt.figure(figsize=(5,3))
     ax = plt.gca()
@@ -275,7 +214,6 @@ def plot_energy_hist(energies,s,xmax):
             alpha=1.0, edgecolor='black', lw=0.4)
     ax.set_ylabel('counts', fontsize=20)
     ax.set_xlabel(s, fontsize=20)
-    #ax.set_xlim([,xmax])
 
     print('av: ', np.mean(energies))
     print('min: ', np.min(energies))
@@ -387,38 +325,3 @@ def plot_avg_ovlp(p,data_sets,labels,markers,colors,ncol=2,loc=2):
     set_label_font(ax,16)
     plt.show()
     
-def plot_angles(angles):
-    
-    d = len(angles)
-    p = d // 2
-    
-    gamma = angles[:p]
-    beta = angles[p:]
-    
-    pp = range(1,p+1)
-    
-    fig, ax = plt.subplots(2,1,sharex=True,figsize = (0.6*p,4))
-    plt.subplots_adjust(hspace=0.15, wspace=0.0)
-    
-    ax[0].set_ylabel('$\\beta_k$', fontsize = 16, labelpad = 5)
-    ax[0].scatter(pp, beta, color = 'tab:blue', s = 75, marker = 'o', 
-                   edgecolor='black', lw=0.9)
-    ax[0].set_ylim([0.0,np.pi/2.0])
-    
-    ax[1].scatter(pp, gamma, color = 'tab:green', s = 75, marker = 's', 
-                   edgecolor='black', lw=0.9)
-    
-    ax[1].set_ylabel('$\gamma_k$', fontsize = 16, labelpad = 5)
-    ax[1].set_xlabel('$k$', fontsize = 16)        
-    
-        
-    ax[1].set_xticks(pp)
-    ax[1].set_ylim([0.0,2*np.pi])
-
-    ax[0].grid(visible=True, which='major', axis='both',color='tab:gray', linestyle=(0, (1, 3)), linewidth=1.0, alpha=0.5)
-    ax[1].grid(visible=True, which='major', axis='both',color='tab:gray', linestyle=(0, (1, 3)), linewidth=1.0, alpha=0.5)
-    
-    for i in [0,1]:
-        set_label_font(ax[i],fs=14)
-    
-    plt.show()
