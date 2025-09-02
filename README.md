@@ -30,7 +30,7 @@ Below, we provide a brief description of the code and data present in the reposi
 * `main.ipynb` : this notebook provides an example of the complete training pipeline for a random instance of the Sherrington-Kirkpatrick model for $n=6$ qubits (see Fig. 2 in our [paper](https://www.arxiv.org/abs/2505.15898)). This pipeline consists of the following steps:
   + calculating the ion-ion couplings
   + generating a random SK instance
-  + calculaing a matrix of the problem Hamiltonian
+  + calculating a matrix of the problem Hamiltonian
   + identifying problem-specific hyperparameters of the ion native ansatz using the proposed heuristic
   + rescaling hyperparameters to eliminate a narrow gorge on the cost landscape
   + evaluating the performance of the ion native QAOA using the trained and asymmetric configurations of hyperparameters
